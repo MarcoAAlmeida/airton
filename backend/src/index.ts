@@ -8,19 +8,27 @@ type ChatRequest = {
 };
 
 const defaultHeaders = {
-	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Headers": "Content-Type",
 	"Access-Control-Allow-Methods": "GET,POST,OPTIONS",
 	"Content-Type": "application/json",
 };
 
 const defaultModel = "@cf/meta/llama-3.1-8b-instruct";
+const maxMessages = 12;
+const maxContentCharacters = 4000;
 
-function json(data: unknown, init?: ResponseInit) {
+function responseHeaders(origin: string) {
+	return {
+		...defaultHeaders,
+		...(origin ? { "Access-Control-Allow-Origin": origin } : {}),
+	};
+}
+
+function json(data: unknown, origin: string, init?: ResponseInit) {
 	return new Response(JSON.stringify(data), {
 		...init,
 		headers: {
-			...defaultHeaders,
+			...responseHeaders(origin),
 			...(init?.headers ?? {}),
 		},
 	});
@@ -37,20 +45,25 @@ function normalizeMessages(messages: ChatMessage[]) {
 
 export default {
 	async fetch(request, env): Promise<Response> {
+		const allowedOrigin = env.ALLOWED_ORIGIN?.trim() || "";
+
 		if (request.method === "OPTIONS") {
 			return new Response(null, {
 				status: 204,
-				headers: defaultHeaders,
+				headers: responseHeaders(allowedOrigin),
 			});
 		}
 
 		const { pathname } = new URL(request.url);
 
 		if (request.method === "GET" && pathname === "/health") {
-			return json({
-				status: "ok",
-				service: "airton-backend",
-			});
+			return json(
+				{
+					status: "ok",
+					service: "airton-backend",
+				},
+				allowedOrigin,
+			);
 		}
 
 		if (request.method === "POST" && pathname === "/api/chat") {
@@ -59,7 +72,7 @@ export default {
 			try {
 				body = await request.json<ChatRequest>();
 			} catch {
-				return json({ error: "Invalid JSON body." }, { status: 400 });
+				return json({ error: "Invalid JSON body." }, allowedOrigin, { status: 400 });
 			}
 
 			const messages = normalizeMessages(body.messages ?? []);
@@ -67,6 +80,26 @@ export default {
 			if (messages.length === 0) {
 				return json(
 					{ error: "At least one non-empty message is required." },
+					allowedOrigin,
+					{ status: 400 },
+				);
+			}
+
+			const totalContentLength = messages.reduce(
+				(total, message) => total + message.content.length,
+				0,
+			);
+
+			if (messages.length > maxMessages || totalContentLength > maxContentCharacters) {
+				return json(
+					{
+						error: "Chat payload is too large.",
+						limits: {
+							maxMessages,
+							maxContentCharacters,
+						},
+					},
+					allowedOrigin,
 					{ status: 400 },
 				);
 			}
@@ -79,7 +112,7 @@ export default {
 			return json({
 				model: env.AI_MODEL || defaultModel,
 				reply: typeof result.response === "string" ? result.response : "",
-			});
+			}, allowedOrigin);
 		}
 
 		return json(
@@ -87,6 +120,7 @@ export default {
 				error: "Not found.",
 				availableRoutes: ["GET /health", "POST /api/chat"],
 			},
+			allowedOrigin,
 			{ status: 404 },
 		);
 	},

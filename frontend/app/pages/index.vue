@@ -115,12 +115,6 @@ async function generateDraft() {
             >
               Generate draft
             </UButton>
-            <UBadge
-              color="neutral"
-              variant="subtle"
-            >
-              API base: {{ runtimeConfig.public.apiBaseUrl }}
-            </UBadge>
           </div>
 
           <UAlert
