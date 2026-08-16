@@ -198,7 +198,7 @@ Cloudflare's free subdomains:
 |---|---|
 | `apps/web` | `airton-48b.pages.dev` |
 | `apps/api` | `airton-api.marcoalmeida-dev-br.workers.dev` |
-| `docs` | not yet deployed |
+| `docs` | `airton-docs.pages.dev` |
 
 Once a real domain is registered, the plan (referred to elsewhere as
 **Option A**) is separate subdomains under one root domain — for example
