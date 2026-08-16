@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "airton-api",
+  "main": "src/entry.py",
+  "compatibility_date": "2026-08-16",
+  "compatibility_flags": ["python_workers", "disable_python_external_sdk"],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "WEB_ORIGIN": "http://localhost:3000"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

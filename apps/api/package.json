@@ -1,0 +1,14 @@
+{
+	"name": "@airton/api",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"deploy": "uv run pywrangler deploy",
+		"dev": "uv run pywrangler dev",
+		"start": "uv run pywrangler dev",
+		"check": "uv run pywrangler deploy --dry-run"
+	},
+	"devDependencies": {
+		"wrangler": "^4.123.0"
+	}
+}
