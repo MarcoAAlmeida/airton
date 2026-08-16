@@ -9,6 +9,7 @@ node_modules/
 .output/
 .nuxt/
 .wrangler/
+docs/site/
 .venv/
 __pycache__/
 *.py[cod]
