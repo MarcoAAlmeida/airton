@@ -6,6 +6,11 @@ docs_dir: content
 nav:
   - Home: index.md
   - Architecture: architecture.md
+  - Roadmap:
+      - Overview: roadmap/index.md
+      - Activity 01:
+          - Overview: roadmap/activity-01/index.md
+          - Deep dive: roadmap/activity-01/deep_dive.md
 
 theme:
   name: material
