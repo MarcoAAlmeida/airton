@@ -1,4 +1,4 @@
-# Spec strategy: contracts now, OpenSpec later
+# Spec strategy: contracts, and OpenSpec for Activity 01
 
 Where this came from: [OpenSpec](https://openspec.dev/), a spec-driven
 development framework — specs are living requirement docs per capability,
@@ -45,44 +45,52 @@ and documents the current `apps/web` ↔ `apps/api` contract; the
 `apps/web` ↔ scraper contract gets filled in there before phase 2's
 endpoints are implemented, not after.
 
-## Why not the CLI yet
+## Why we changed our mind about the CLI
 
-Local specs per sub-project's *internal* domain logic (as opposed to the
-root contract layer above) still wait on that sub-project existing as
-real code — writing one for the scraper before it exists would mean
-documenting structure that doesn't exist yet, the same failure mode we
-already flagged for `AGENTS.md`.
+The original reasoning for deferring the CLI conflated two different
+things it provides: contract-boundary enforcement between sub-projects
+(legitimately not needed until a second one exists — see the correction
+above, since that premise turned out to be wrong too) and a **persisted,
+reviewable plan** written before implementation, protecting against an
+agent misinterpreting a requirement. The second one doesn't need a
+second sub-project at all — it needs requirements ambiguous enough that
+the interpretation is worth checking, which is exactly where Activity 01
+starts (choice of Source, event shapes, RAG design, Agent framework — all
+have more than one reasonable reading). Plan Mode gives that review gate
+*in-session*, but the plan itself doesn't persist anywhere durable,
+shareable with teammates, or browsable months later — which is what
+actually mattered. That's the gap the CLI closes, so we installed it.
 
-We're also not installing the OpenSpec CLI (`@fission-ai/openspec`) yet.
-It brings its own proposal/review ceremony and slash commands — real
-process overhead that should be earned, not adopted on the strength of
-one article. Plain markdown gets us the boundary discipline without the
-extra dependency; we can graduate to the actual tool once the lightweight
-version proves itself.
+**Installed**: `@fission-ai/openspec` globally, initialized at the repo
+root via `openspec init --tools claude` (no scraper sub-project folder
+exists yet for it to live under instead). This added `/opsx:explore`,
+`/opsx:propose`, `/opsx:apply`, and `/opsx:archive` slash commands and
+skills for Claude Code, plus `openspec/config.yaml`, whose `context:`
+field points at `AGENTS.md`, `.spec/contracts.md`, and
+`docs/content/roadmap/` rather than duplicating them.
 
-Specs, once they exist, will **not** live under `docs/content/` — that
-tree is human-facing narrative (architecture description, roadmap,
-decisions like this one). A spec is a contract other agents and devs
-check before changing code, so it belongs next to `AGENTS.md` at the
-repo root and at each sub-project root, not inside the documentation
-site.
+Local specs per sub-project's *internal* domain logic still wait on that
+sub-project existing as real code — that reasoning is unchanged.
+
+Specs and OpenSpec's own `changes/`/`specs/` artifacts live in
+`openspec/` and `.spec/` at the repo root — **not** under `docs/content/`,
+which stays human-facing narrative (architecture description, roadmap,
+decisions like this one).
 
 ## Status — this is the register of intent
 
 - **Done:** `.spec/contracts.md` exists at the repo root, documenting the
-  current `apps/web` ↔ `apps/api` contract.
-- **Next (not started):** before Activity 01 phase 2 (the scraper's BFF
-  endpoints) is implemented, add the `apps/web` ↔ scraper orchestration
-  contract to `.spec/contracts.md` — the shared event shapes
-  (`scrape.requested` / `page.scraped` / `scrape.completed` /
-  `scrape.failed`) and `scrape_id` semantics designed in conversation,
-  pinned down before the endpoints exist, not after.
+  current `apps/web` ↔ `apps/api` contract. OpenSpec CLI installed and
+  initialized at the repo root for Activity 01.
+- **Next (not started):** draft the first real proposal via
+  `/opsx:propose` for Activity 01 phase 1 (the first scraper). Before
+  Activity 01 phase 2 (the scraper's BFF endpoints) is implemented, add
+  the `apps/web` ↔ scraper orchestration contract to `.spec/contracts.md`
+  — the shared event shapes (`scrape.requested` / `page.scraped` /
+  `scrape.completed` / `scrape.failed`) and `scrape_id` semantics
+  designed in conversation — before the endpoints exist, not after.
 - **Later (not started):** local specs per sub-project's internal domain
-  logic, once each one exists as real code. Full OpenSpec CLI adoption
-  (proposals, deltas, review workflow) only if and when the ceremony
-  itself — not just the contract boundary — earns its cost. Separately:
-  whether/how to persist *plans* (not contracts) as durable, git-tracked,
-  team-shareable records is still an open discussion, not yet resolved.
+  logic, once each one exists as real code.
 
 ## Migration direction for existing docs
 
