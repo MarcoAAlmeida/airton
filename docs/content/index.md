@@ -8,3 +8,5 @@ fit together, how each part is deployed, and how requests flow through the
 system.
 
 See [Roadmap](roadmap/index.md) for what we're building next.
+
+See [Design Decisions](sdd/index.md) for why we work the way we do.
