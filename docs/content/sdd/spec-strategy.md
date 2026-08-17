@@ -5,14 +5,23 @@ development framework — specs are living requirement docs per capability,
 and `changes/` hold proposals (proposal, design, tasks, spec deltas)
 reviewed before implementation.
 
-Worth being precise about one thing: the tool's actual default is a
-single `openspec/` directory with `specs/` and `changes/`. It has **no
-documented guidance for monorepos or nested spec layers per
-sub-project**. The idea of a root `.openspec/` (contracts only) plus a
-local `.openspec/` per sub-project was a third party's adaptation of
-OpenSpec's concepts to a monorepo, not something the tool prescribes
-out of the box. We're adopting the *concept*, not treating that tree as
-an official pattern.
+**Correction, checked against the tool's actual source:** an earlier
+version of this page said nested `openspec/` roots per sub-project were
+just "a third party's adaptation of OpenSpec's concepts... not something
+the tool prescribes out of the box." That doubt wasn't warranted, and the
+original plan — a root spec layer for contracts plus a local spec layer
+per sub-project — was right about how the tool actually behaves, not just
+a plausible-sounding idea. The public docs don't spell out monorepo
+usage, but `src/core/root-selection.ts` and `src/core/planning-home.ts`
+(read directly from [github.com/Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec))
+confirm it: root resolution walks up from the current working directory
+and returns the **nearest** ancestor containing a qualifying `openspec/`
+folder. A code comment there explains this is deliberate — without it, a
+directory like `~/openspec/<id>` would become a "phantom root" capturing
+every command run anywhere under `$HOME`. A sub-project's own
+`openspec/` genuinely does take precedence over the repo root's when you
+work from inside it. This is real, intentional, built-in behavior, not
+an unofficial adaptation.
 
 ## The boundary rule we're adopting
 
@@ -90,7 +99,10 @@ decisions like this one).
   `scrape.completed` / `scrape.failed`) and `scrape_id` semantics
   designed in conversation — before the endpoints exist, not after.
 - **Later (not started):** local specs per sub-project's internal domain
-  logic, once each one exists as real code.
+  logic, as a nested `openspec/` root inside that sub-project (confirmed
+  to work as intended, not a guess) — once that sub-project exists as
+  real code. Only the timing is deferred, not whether this is the right
+  mechanism.
 
 ## Migration direction for existing docs
 
