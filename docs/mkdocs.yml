@@ -17,6 +17,15 @@ theme:
   name: material
   palette:
     primary: yellow
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
 
 markdown_extensions:
   - pymdownx.superfences:
