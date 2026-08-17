@@ -11,7 +11,10 @@ nav:
       - Activity 01:
           - Overview: roadmap/activity-01/index.md
           - Deep dive: roadmap/activity-01/deep_dive.md
-  - Design Decisions: sdd/index.md
+  - Design Decisions:
+      - Overview: sdd/index.md
+      - AGENTS.md strategy: sdd/agents-md-strategy.md
+      - Spec strategy: sdd/spec-strategy.md
 
 theme:
   name: material
