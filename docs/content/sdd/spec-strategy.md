@@ -29,13 +29,29 @@ This is the same boundary discipline behind the
 instead of working instructions: root stays generic, sub-projects own
 their own detail.
 
-## Why phased, and why not the CLI yet
+## Correction: the root contract boundary already exists
 
-The sub-projects this would eventually cover — scraper, RAG, Agent — don't
-exist as code yet, so there's nothing for a local spec to describe and no
-second sub-project yet to enforce a contract boundary against. Writing
-those specs now would mean documenting structure that doesn't exist,
-which is exactly the failure mode we already flagged for `AGENTS.md`.
+An earlier version of this page said local specs and the root contract
+file should wait until a second sub-project existed. That was wrong —
+`apps/web` and `apps/api` are already two independently-deployed
+components with a real contract between them today (the `/api/chat`
+request/response shape, the shared-secret auth header), and the *next*
+piece of work (Activity 01 phase 2, the scraper's BFF endpoints) is
+itself a new contract between `apps/web` and scraper orchestration. There
+was never a point where "no boundary exists yet" was actually true — that
+was an arbitrary exclusion of the existing web/api relationship, not a
+real state of the repo. `.spec/contracts.md` now exists at the repo root
+and documents the current `apps/web` ↔ `apps/api` contract; the
+`apps/web` ↔ scraper contract gets filled in there before phase 2's
+endpoints are implemented, not after.
+
+## Why not the CLI yet
+
+Local specs per sub-project's *internal* domain logic (as opposed to the
+root contract layer above) still wait on that sub-project existing as
+real code — writing one for the scraper before it exists would mean
+documenting structure that doesn't exist yet, the same failure mode we
+already flagged for `AGENTS.md`.
 
 We're also not installing the OpenSpec CLI (`@fission-ai/openspec`) yet.
 It brings its own proposal/review ceremony and slash commands — real
@@ -53,18 +69,20 @@ site.
 
 ## Status — this is the register of intent
 
-- **Now:** no spec files exist yet. This page is the only record of the
-  decision.
-- **Next (not started):** when [Activity 01](../roadmap/activity-01/index.md)'s
-  phase 1 (the first scraper) actually begins, create a root-level
-  `contracts.md` pinning down the shared event shapes
+- **Done:** `.spec/contracts.md` exists at the repo root, documenting the
+  current `apps/web` ↔ `apps/api` contract.
+- **Next (not started):** before Activity 01 phase 2 (the scraper's BFF
+  endpoints) is implemented, add the `apps/web` ↔ scraper orchestration
+  contract to `.spec/contracts.md` — the shared event shapes
   (`scrape.requested` / `page.scraped` / `scrape.completed` /
-  `scrape.failed`) and `scrape_id` semantics we designed in conversation,
-  before any scraper code is written against them.
-- **Later (not started):** local specs per sub-project, once each one
-  exists as real code. Full OpenSpec CLI adoption (proposals, deltas,
-  review workflow) only if and when a second sub-project genuinely needs
-  boundary enforcement against the first — not before.
+  `scrape.failed`) and `scrape_id` semantics designed in conversation,
+  pinned down before the endpoints exist, not after.
+- **Later (not started):** local specs per sub-project's internal domain
+  logic, once each one exists as real code. Full OpenSpec CLI adoption
+  (proposals, deltas, review workflow) only if and when the ceremony
+  itself — not just the contract boundary — earns its cost. Separately:
+  whether/how to persist *plans* (not contracts) as durable, git-tracked,
+  team-shareable records is still an open discussion, not yet resolved.
 
 ## Migration direction for existing docs
 
